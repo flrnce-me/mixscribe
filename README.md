@@ -18,6 +18,10 @@ Built by a DJ, for DJs — with VR raves (VRChat) in mind, but not limited to th
 - **Light on the services it relies on.** Recognition requests stay occasional and modest.
 - **Open source**, under the GPL-3.0.
 
+## Contributing
+
+Issues and ideas are welcome here. Note that this GitHub repository is a **mirror** of a self-hosted repository: pull requests are welcome too, but they are merged on the main repository and then come back here — so please don't be surprised if a PR is closed rather than merged through GitHub.
+
 ## Credits
 
 Audio recognition builds on the work of [SongRec](https://github.com/marin-m/SongRec), the open-source Shazam client by Marin M., which made Shazam's fingerprinting available outside of official apps.
