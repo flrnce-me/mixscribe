@@ -1,58 +1,59 @@
-# Mixscribe — design notes
+# Mixscribe — notes
 
-Working notes: what Mixscribe is meant to do, the decisions taken so far, and the open questions. Nothing here is final.
+My working notes: what I want, what's decided, what's still up in the air. None of it is set in stone.
 
-## Scope
+## What I want it to do
 
-1. **After the live** — a reliable, timestamped tracklist of a set in YouTube description format (`00:00 Artist – Title`), with streaming links; the material for the post-set promo and the YouTube video.
-2. **Track recognition** — identify tracks in older recordings that have no play history, and tracks heard while raving.
-3. **During the live** *(exploratory)* — set recording; a live tracklist page, possibly shown in VR (VRChat).
+1. **After a set:** a tracklist with timestamps in YouTube format (`00:00 Artist – Title`), with links. Plus help for the promo and the YouTube video.
+2. **Recognize tracks:** in old recordings where I don't know what I played, and for tracks I hear while raving.
+3. **During a set** (not sure yet): recording, a live tracklist page, maybe something showing in VR.
 
-The scope is expected to grow. Mixscribe is a DJ companion, not only an "after the set" tool.
+It'll probably grow beyond that. It's meant to be a DJ sidekick, not just an "after the set" thing.
 
-## Principles
+## Ground rules
 
-- **Your own sets first.** Mixscribe documents the user's own music. It must not become a tool to rip full tracklists of other DJs' sets without their consent. Any "live tracklist" feature for a club night only shows tracks a DJ has chosen to share.
-- **Exact data beats guessing.** When the DJ software keeps a play history, use it. Audio recognition is the fallback.
-- **Light on the services we rely on.** Recognition requests stay occasional and modest.
-- **Personal data stays local.** DJ libraries, play histories and recordings never go into the repository (see `.gitignore`).
-- **Cross-platform.** VRChat users are mostly on Windows, DJ software often on macOS, development happens on Linux.
+- **Your own sets.** If there's ever a live tracklist for a whole club night, it only shows what each DJ chose to share. No ripping other people's sets.
+- **Real data first.** If the DJ software already knows what was played, use that. Recognizing tracks by ear is the backup plan.
+- **Go easy on the services we use.** A few requests here and there, not a flood.
+- **Your stuff stays on your machine.** Libraries, play history, recordings: none of that goes in this repo (see `.gitignore`).
+- **Works everywhere.** People in VRChat are mostly on Windows, DJ software often runs on a Mac, and I build this on Linux.
 
-## Data sources
+## Where the data comes from
 
-### rekordbox play history (preferred for your own sets)
+### rekordbox history (best option for your own sets)
 
-- rekordbox records every track played, with its time, in its local library database (`master.db`).
-- Since rekordbox 6, `master.db` is an **encrypted SQLite database** (SQLCipher). The key is publicly known, and [`pyrekordbox`](https://pypi.org/project/pyrekordbox/) (MIT) can read it.
-- Work on a **copy** of the database, never on the live file while rekordbox runs.
-- **To verify first:** whether tracks played from streaming services (e.g. Spotify) appear in the history; the offset between the start of the recording and the first track.
-- Existing alternative: the commercial app *Now Playing* reads the same history and exports YouTube-style tracklists (export seems to require its Pro version).
+- rekordbox remembers every track you play and when, in its library file (`master.db`).
+- Since rekordbox 6 that file is encrypted. The key is public though, and [`pyrekordbox`](https://pypi.org/project/pyrekordbox/) (MIT) can open it.
+- Always work on a **copy**, never on the real file while rekordbox is running.
+- **Need to check first:** do tracks played from Spotify & co show up in the history? And how big is the gap between hitting record and the first track?
+- There's already a paid app that does part of this, *Now Playing*. It reads the same history and exports YouTube tracklists (but that seems to be a Pro feature).
 
-### Audio recognition (fallback, older sets, tracks heard in clubs)
+### Track recognition (backup plan, old sets, tracks at parties)
 
-- The only free route is the approach pioneered by [SongRec](https://github.com/marin-m/SongRec) (GPL-3.0): compute Shazam's audio fingerprint locally and send **only the fingerprint** (never the audio) to Shazam's servers. SongRec relies on the EU interoperability exception (no official Shazam client on Linux).
-- In Python: [`shazamio`](https://pypi.org/project/shazamio/) (MIT), built on [`shazamio-core`](https://github.com/shazamio/shazamio-core) (MIT, Rust).
-- **Unofficial**: no guarantee, it may break whenever Shazam changes its protocol, and it is rate-limited in practice. Hence the "light" principle.
-- A Shazam match also returns the track's Shazam link and the matched offset within the track.
-- Official routes (ShazamKit, ACRCloud, AudD) are paid or not available on Windows.
-- Limits: transitions, edits and unreleased tracks often come back unmatched.
+- The only free way is what [SongRec](https://github.com/marin-m/SongRec) (GPL-3.0) does: compute Shazam's audio fingerprint on your machine and send **just the fingerprint** to Shazam (never the audio). SongRec leans on the EU right to interoperability, since there's no official Shazam app on Linux.
+- In Python: [`shazamio`](https://pypi.org/project/shazamio/) (MIT), which uses [`shazamio-core`](https://github.com/shazamio/shazamio-core) (MIT, written in Rust).
+- It's **unofficial**: it can break any day if Shazam changes something, and you get throttled if you overdo it. Hence "go easy".
+- When Shazam finds a match, it also gives the track's Shazam link and where in the track the match is.
+- The official options (ShazamKit, ACRCloud, AudD) cost money or don't run on Windows.
+- Expect gaps: transitions, edits and unreleased tracks often come back as "no idea".
 
-## Decisions
+## Decided
 
-| Date | Decision |
+| Date | What |
 |---|---|
-| 2026-10-17 | Name **Mixscribe** — the scribe of the mix: it listens, identifies and writes down. |
-| 2026-10-17 | **Open source, GPL-3.0.** Dependencies must stay GPL-compatible (MIT is fine). |
-| 2026-10-17 | Main repository is self-hosted; github.com/flrnce-me/mixscribe is a push mirror. |
+| 2026-10-17 | Name: **Mixscribe**. The scribe of the mix: it listens, figures out what's playing, writes it down. |
+| 2026-10-17 | **Open source, GPL-3.0.** Anything we depend on has to be compatible (MIT is fine). |
+| 2026-10-17 | The main repo is self-hosted. github.com/flrnce-me/mixscribe is a mirror. |
 
-### Name research (2026-10-17)
+### How I picked the name (2026-10-17)
 
-Rejected: *Outro* (too narrow), *Crate* (existing open-source DJ library manager, crates.app, Crate Hackers), *Cuepilot* (commercial live-production software CuePilot, plus a Serato hot-cue tool), *Trackflow* (576 GitHub projects), *Tracktrace* (parcel-tracking jargon).
-*Mixscribe*: no trademark found in TMview (EUIPO, INPI, USPTO and ~70 offices); no active product; free on GitHub, PyPI and npm. A defunct transcription API used `mixscribe.io` in 2023–2024; `mixscribe.com` is parked on a domain marketplace.
+Dropped: *Outro* (too narrow), *Crate* (already an open-source DJ library app, plus crates.app and Crate Hackers), *Cuepilot* (a real company makes live TV software called that, and there's a Serato tool too), *Trackflow* (576 projects on GitHub), *Tracktrace* (sounds like parcel tracking).
 
-## Open questions
+*Mixscribe*: no trademark in TMview (EU, France, US and around 70 other offices), no active product, free on GitHub, PyPI and npm. Someone ran a transcription API on `mixscribe.io` in 2023–2024 but it's dead now, and `mixscribe.com` is just parked for sale.
 
-- What exactly happens *during* the live? (recording, live tracklist, VR overlay…)
-- Where does the after-live part run: on the machine running rekordbox, or on a copy of its database elsewhere?
-- How far should the promo part go (text only? visuals? video assembly?)
-- Do streamed tracks show up in rekordbox history?
+## Still open
+
+- What exactly happens *during* a set? Recording, live tracklist, something in VR?
+- Does the after-set part run on the computer with rekordbox, or on a copy of its library somewhere else?
+- How far does the promo part go? Just text? Visuals? Putting the video together?
+- Do streamed tracks show up in the rekordbox history?
