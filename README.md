@@ -1,4 +1,4 @@
-# Mixscribe
+<p align="center"><img src="assets/banner.png" alt="Mixscribe" width="100%"></p>
 
 I DJ, and after every set it's the same chore: figuring out what I played, writing a tracklist with timestamps for YouTube, posting stuff about it. Mixscribe is me trying to make all that happen on its own.
 
